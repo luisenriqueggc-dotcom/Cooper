@@ -1,7 +1,13 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-export function Login({ configured }: { configured: boolean }) {
+export function Login({
+  configured,
+  destination = "/board",
+}: {
+  configured: boolean;
+  destination?: "/chat" | "/board";
+}) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   return (
@@ -34,7 +40,7 @@ export function Login({ configured }: { configured: boolean }) {
               });
               const d = await r.json();
               if (!r.ok) throw new Error(d.error);
-              window.location.href = "/board";
+              window.location.href = destination;
             } catch (e) {
               setError((e as Error).message);
             } finally {

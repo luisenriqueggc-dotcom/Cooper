@@ -99,6 +99,62 @@ test("migración, RLS, auditoría, atomicidad, versiones e idempotencia", async 
     });
     await assert.rejects(apply(bad), /Inactive/);
     assert.equal(await count("tasks"), 1);
+    await db.exec("reset role;");
+    await db.exec(
+      await readFile(
+        new URL(
+          "../supabase/migrations/202610190002_task_deletion.sql",
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    );
+    await as(admin);
+    const pendingDeleteUpdate = await propose({
+      kind: "update",
+      task_id: id,
+      expected_version: 2,
+      task,
+    });
+    await assert.rejects(db.query("select delete_task($1,1)", [id]), /changed/);
+    await as(viewer);
+    await assert.rejects(
+      db.query("select delete_task($1,2)", [id]),
+      /Forbidden/,
+    );
+    await as(admin);
+    const historyBefore = await count("task_history");
+    await db.query("select delete_task($1,2)", [id]);
+    await db.query("select delete_task($1,2)", [id]);
+    assert.equal(await count("tasks"), 0);
+    assert.equal(await count("task_assignees"), 0);
+    assert.equal(await count("task_history"), historyBefore + 1);
+    await assert.rejects(apply(pendingDeleteUpdate), /changed|deleted/);
+    // Even a proposal crafted with the new version cannot update a deleted task.
+    const deletedEdit = await propose({
+      kind: "update",
+      task_id: id,
+      expected_version: 3,
+      task,
+    });
+    await assert.rejects(apply(deletedEdit), /deleted/);
+    await as(viewer);
+    assert.equal(await count("tasks"), 0);
+    await db.exec("reset role;");
+    const deleted = await db.query<{ deleted_by: string; version: number }>(
+      "select deleted_by,version from tasks where id=$1",
+      [id],
+    );
+    assert.equal(deleted.rows[0].deleted_by, admin);
+    assert.equal(deleted.rows[0].version, 3);
+    // Operator recovery preserves task, assignments and audit records.
+    await db.query(
+      "update tasks set deleted_at=null,deleted_by=null,version=version+1 where id=$1",
+      [id],
+    );
+    await as(admin);
+    assert.equal(await count("tasks"), 1);
+    assert.equal(await count("task_assignees"), 1);
     await db.exec(
       `insert into comments(task_id,body) values('${id}','Privado');insert into storage.objects(bucket_id,name) values('task-files','private.pdf');`,
     );

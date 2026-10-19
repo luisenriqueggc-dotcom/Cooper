@@ -858,3 +858,100 @@ nav button.nav-active {
     padding: 10px;
   }
 }
+
+.standalone-chat-link {
+  font-size: 12px;
+  display: block;
+  margin-top: 18px;
+  text-decoration: none;
+  padding: 10px 0;
+}
+.delete-section {
+  margin-top: 20px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.danger-link {
+  background: transparent;
+  color: #a73535;
+  padding-left: 0;
+}
+.danger-button {
+  background: #a73535;
+  margin-top: 14px;
+}
+.delete-confirm {
+  padding: 14px;
+  background: #fff3f1;
+  border: 1px solid #efd4d0;
+  border-radius: 8px;
+  line-height: 1.6;
+}
+.chat-planner-link {
+  margin-left: auto;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.chat-only {
+  display: block;
+  min-height: 100dvh;
+  background: #eaf1eb;
+}
+.chat-only .chat {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  max-width: 720px;
+  height: 100dvh;
+  margin: auto;
+  border: 0;
+  box-shadow: 0 0 35px #173d2510;
+}
+.chat-only .chat-heading {
+  height: auto;
+  min-height: 76px;
+  padding: 18px 20px;
+  flex-shrink: 0;
+}
+.chat-only .chat-messages {
+  min-height: 0;
+  overscroll-behavior: contain;
+  padding: 20px;
+}
+.chat-only .message {
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.chat-only .proposal {
+  font-size: 14px;
+}
+.chat-only .chat-input {
+  flex-shrink: 0;
+  padding: 14px 20px max(14px, env(safe-area-inset-bottom));
+  background: #fff;
+}
+.chat-only .chat-input textarea {
+  font-size: 16px;
+  min-height: 72px;
+  max-height: 150px;
+}
+.chat-only .chat-input button {
+  font-size: 14px;
+  min-height: 44px;
+}
+.chat-only .notice {
+  margin: 8px 16px 0;
+  flex-shrink: 0;
+}
+@media (max-width: 620px) {
+  .chat-only .chat-heading {
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+  .chat-only .chat-messages {
+    padding: 16px;
+  }
+  .chat-only .chat-input {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
